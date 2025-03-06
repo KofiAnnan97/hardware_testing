@@ -1,6 +1,19 @@
 #include <Arduino.h>
 #include "TeensyThreads.h"
 
+/*
+This script is designed for a four wheel vehicle equipped with mecanum wheels.
+Configuration:
+
+          |=| |==========| |=|
+  Wheel 1 | |+|          |+| | Wheel 2
+          |=| |          | |=|
+              |          |
+          |=| |          | |=|
+  Wheel 4 | |+|          |+| | Wheel 3
+          |=| |==========| |=|
+*/
+
 // Motor Driver 1 Pins
 #define WHEEL1_EN 23
 #define WHEEL2_EN 22
@@ -43,13 +56,44 @@ struct wheelState{
 wheelState w1, w2, w3, w4;
 
 /* Twist Values */
-double linear_x = 0.0;   //speed  => [-1.0, 1.0] going from backwards to forwards
-double linear_y = 0.0;   //strafe => [-1.0, 1.0] going left to right
-double angular_z = 0.0;  //turn 
+double linear_x = 0.0;   //speed  => [-1.0, 1.0] backwards to forwards
+double linear_y = 0.0;   //strafe => [-1.0, 1.0] left to right
+double angular_z = 0.0;  //turn   => [-1.0, 1.0] left to right
 
 /* Command Values */
 String command;
-const String delim = " ";
+const char delimiter = ' ';
+
+void helpMenu(){
+  Serial.println("The following commands are supported:");
+  Serial.println("\t- stop                        : sets all motors to zero");
+  Serial.println("\t- vtest                       : test velocity control for all wheels");
+  Serial.println("\t- mtest                       : test wheel config via possible movement patterns");
+  Serial.println("\t- linear_x linear_y angular_z : set the movement of vehicle (must be single space between values)");
+  Serial.println("\t- help                        : bring up this menu");
+}
+
+void displayWheelInputs(double* wheelInputs){
+  Serial.print("   | Wheel Inputs | \nFL: ");
+  Serial.print(wheelInputs[0]);
+  Serial.print("\t FR: ");
+  Serial.print(wheelInputs[1]);
+  Serial.print("\nBL: ");
+  Serial.print(wheelInputs[3]);
+  Serial.print("\t BR: ");
+  Serial.println(wheelInputs[2]);
+}
+
+/*void displayWheelPWMs(wheelState w1, wheelState w2, wheelState w3, wheelState w4){
+  Serial.print("     | Wheel PWMs | \nFL: ");
+  //Serial.print(analogRead(w1.pwm_pin));
+  Serial.print("\t FR: ");
+  //Serial.print(analogRead(w1.pwm_pin));
+  Serial.print("\nBL: ");
+  //Serial.print(analogRead(w1.pwm_pin));
+  Serial.print("\t BR: ");
+  //Serial.println(analogRead(w1.pwm_pin));
+}*/
 
 void setup() {
   /* OUTPUTS */
@@ -84,6 +128,8 @@ void setup() {
   w4 = {WHEEL4_IN1, WHEEL4_IN2, WHEEL4_EN, MIN_MOTOR_4_LIMIT, MAX_MOTOR_LIMIT};
 
   Serial.begin(115200);
+  helpMenu();
+  stopMotors();
 }
 
 void sendToMotor(wheelState ws, double speed_input){
@@ -121,118 +167,17 @@ void sendToMotor(wheelState ws, double speed_input){
   }
 }
 
-void displayWheelInputs(float* wheelInputs){
-  Serial.print("   | Wheel Inputs | \nFL: ");
-  Serial.print(wheelInputs[0]);
-  Serial.print("\t FR: ");
-  Serial.print(wheelInputs[1]);
-  Serial.print("\nBL: ");
-  Serial.print(wheelInputs[3]);
-  Serial.print("\t BR: ");
-  Serial.println(wheelInputs[2]);
+void stopMotors(){
+  sendToMotor(w1, 0.0);
+  sendToMotor(w2, 0.0);
+  sendToMotor(w3, 0.0);
+  sendToMotor(w4, 0.0);
 }
 
-void displayWheelPWMs(wheelState w1, wheelState w2, wheelState w3, wheelState w4){
-  Serial.print("     | Wheel PWMs | \nFL: ");
-  //Serial.print(analogRead(w1.pwm_pin));
-  Serial.print("\t FR: ");
-  //Serial.print(analogRead(w1.pwm_pin));
-  Serial.print("\nBL: ");
-  //Serial.print(analogRead(w1.pwm_pin));
-  Serial.print("\t BR: ");
-  //Serial.println(analogRead(w1.pwm_pin));
-}
+double* fromTwistToPWM(double speed, double strafe, double turn){
+  double *wheels = new double[4];
 
-String getStrSegmentByDelim(String originalStr, char delim, int order){
-  int delimCount = 0;
-  String segment = "";
-  unsigned int originalStrLen = originalStr.length();
-  //Serial.println(originalStrLen);
-  //char charArr[originalStrLen];
-  //originalStr.toCharArray(charArr, sizeof(charArr));
-  for(unsigned int i = 0; i < originalStrLen; i++){
-    //Serial.print("Does char '");
-    //Serial.print(originalStr[i]);
-    //Serial.print("' == delim: ");
-    Serial.println(originalStr.c_str()[i] == delim);
-    if(order < delimCount) break;
-    else if(originalStr.c_str()[i] == delim) delimCount++;
-    else if(order == delimCount && originalStr.c_str()[i] != delim) segment += originalStr[i];
-  }
-  Serial.print("Value: ");
-  Serial.println(segment);
-  return segment; 
-}
-
-/*
-void movementTest(){
-  // Forward
-  sendToMotor(w1, 1, 0, 0.5);
-  sendToMotor(w2, 1, 0, 0.5);
-  sendToMotor(w3, 1, 0, 0.5);
-  sendToMotor(w4, 1, 0, 0.5);  
-  delay(2000);
-
-  // Backward 
-  sendToMotor(w1, 0, 1, 0.5);
-  sendToMotor(w2, 0, 1, 0.5);
-  sendToMotor(w3, 0, 1, 0.5);
-  sendToMotor(w4, 0, 1, 0.5);  
-  delay(2000);
-
-  // Strafe Left 
-  sendToMotor(w1, 0, 1, 0.5);
-  sendToMotor(w2, 1, 0, 0.5);
-  sendToMotor(w3, 0, 1, 0.5);
-  sendToMotor(w4, 1, 0, 0.5);  
-  delay(2000);
-
-  // Strafe Right 
-  sendToMotor(w1, 1, 0, 0.5);
-  sendToMotor(w2, 0, 1, 0.5);
-  sendToMotor(w3, 1, 0, 0.5);
-  sendToMotor(w4, 0, 1, 0.5);  
-  delay(2000);
-
-  // Turn Left 
-  sendToMotor(w1, 0, 1, 0.5);
-  sendToMotor(w2, 1, 0, 0.5);
-  sendToMotor(w3, 1, 0, 0.5);
-  sendToMotor(w4, 0, 1, 0.5);  
-  delay(2000);
-
-  // Turn Right 
-  sendToMotor(w1, 1, 0, 0.5);
-  sendToMotor(w2, 0, 1, 0.5);
-  sendToMotor(w3, 0, 1, 0.5);
-  sendToMotor(w4, 1, 0, 0.5);  
-  delay(2000);
-}
-
-void speedTest(){
-  // Speed Up
-  for(double i = 0.0; i < 1.5; i += 0.1){
-    sendToMotor(w1, 1, 0, i);
-    sendToMotor(w2, 1, 0, i);
-    sendToMotor(w3, 1, 0, i);
-    sendToMotor(w4, 1, 0, i);
-    delay(2000);
-  }
-
-  // Slow down
-  for(double j = 1.0; j > -0.5; j -= 0.1){
-    sendToMotor(w1, 1, 0, j);
-    sendToMotor(w2, 1, 0, j);
-    sendToMotor(w3, 1, 0, j);
-    sendToMotor(w4, 1, 0, j);
-    delay(2000);
-  }
-}*/
-
-float* fromTwistToPWM(double speed, double strafe, double turn){
-  float *wheels = new float[4];
-
-  wheels[0] = speed + strafe - turn; 
+  wheels[0] = speed + strafe + turn; 
   wheels[1] = speed - strafe - turn; 
   wheels[3] = speed - strafe + turn;
   wheels[2] = speed + strafe - turn;
@@ -246,38 +191,111 @@ float* fromTwistToPWM(double speed, double strafe, double turn){
   return wheels;
 }
 
+String getStrSegmentByDelim(String originalStr, char delim, int order){
+  int delimCount = 0;
+  int startIdx = 0;
+  int endIdx = 0;
+  for(unsigned int i = 0; i < originalStr.length(); i++){
+    if(originalStr[i] == delim){
+      ++delimCount;
+      if(order < delimCount) break;
+      startIdx = i+1;
+      endIdx = i+1;
+    } 
+    else if(order == delimCount && originalStr[i] != delim) endIdx++;
+  }
+  if(startIdx < endIdx) return(originalStr.substring(startIdx, endIdx+1));
+  else return "";
+}
+
+void movementTest(){
+  // Sequence: Forward, Backward, Strafe Left, Strafe Right, Turn Left, Turn Right 
+  double wheel1TestVals[] = {0.5,-0.5,-0.5,0.5,-0.5,0.5};
+  double wheel2TestVals[] = {0.5,-0.5,0.5,-0.5,0.5,-0.5};
+  double wheel3TestVals[] = {0.5,-0.5,-0.5,0.5,0.5,-0.5};
+  double wheel4TestVals[] = {0.5,-0.5,0.5,-0.5,-0.5,0.5};
+
+  for(int i = 0; i < 6; i++){
+    double wheelInputs[] = {wheel1TestVals[i], wheel2TestVals[i], wheel3TestVals[i], wheel4TestVals[i]};
+    sendToMotor(w1, wheel1TestVals[i]);
+    sendToMotor(w2, wheel2TestVals[i]);
+    sendToMotor(w3, wheel3TestVals[i]);
+    sendToMotor(w4, wheel4TestVals[i]);
+    displayWheelInputs(wheelInputs); 
+    delay(2000);
+  }
+  stopMotors();
+}
+
+void speedTest(){
+  // Speed Up
+  for(double i = 0.0; i < 1.2; i += 0.1){
+    sendToMotor(w1, i);
+    sendToMotor(w2, i);
+    sendToMotor(w3, i);
+    sendToMotor(w4, i);
+    Serial.print("Current Speed Input: ");
+    Serial.println(i);
+    delay(2000);
+  }
+
+  // Slow down
+  for(double j = 1.0; j > 0; j -= 0.1){
+    sendToMotor(w1, j);
+    sendToMotor(w2, j);
+    sendToMotor(w3, j);
+    sendToMotor(w4, j);
+    Serial.print("Current Speed Input: ");
+    Serial.println(j);
+    delay(2000);
+  }
+  stopMotors();
+}
+
 void loop() {
-  // Check that motors speed up and slow down properly
-  //speedTest();
-
-  // Check that mecanum wheel configuration can turn and strafe
-  //movementTest();
-
   // Send commands to mecanum wheels based on speed, strafe and turn
-  /*if(Serial.available()){
+  if(Serial.available()){
     command = Serial.readStringUntil('\n');
     command.trim();
-    Serial.print("Twist Command: ");
+    Serial.print("Command: ");
     Serial.println(command);
-    if(command.equals("stop")){
-      linear_x  = 0.0; 
-      linear_y  = 0.0; 
-      angular_z = 0.0;
-    }
+    // Bring up the help menu
+    if(command.equals("help")) helpMenu();
+     // Check that motors speed up and slow down properly
+    else if(command.equals("vtest")) speedTest();
+    // Check that mecanum wheel configuration can turn and strafe
+    else if(command.equals("mtest")) movementTest();
     else{
-      linear_x  = getStrSegmentByDelim(command, ';', 0).toFloat();
-      linear_y  = getStrSegmentByDelim(command, ';', 1).toFloat();
-      angular_z = getStrSegmentByDelim(command, ';', 2).toFloat();
+      if(command.equals("stop")){
+        linear_x  = 0.0; 
+        linear_y  = 0.0; 
+        angular_z = 0.0;
+      }
+      else{
+        String x = getStrSegmentByDelim(command, delimiter, 0);
+        String y = getStrSegmentByDelim(command, delimiter, 1);
+        String z = getStrSegmentByDelim(command, delimiter, 2);
+        linear_x  = x.toFloat();
+        linear_y  = y.toFloat();
+        angular_z = z.toFloat();
+        if(DEBUG == 1){
+          Serial.print("X: ");
+          Serial.print(linear_x);
+          Serial.print(" Y: ");
+          Serial.print(linear_y);
+          Serial.print(" Z: ");
+          Serial.println(angular_z);
+        }
+      }
+      // Convert revelant ROS Twist message to PWM values
+      double *wheelInputs = fromTwistToPWM(linear_x, linear_y, angular_z);
+      sendToMotor(w1, wheelInputs[0]);
+      sendToMotor(w2, wheelInputs[1]);
+      sendToMotor(w3, wheelInputs[2]);
+      sendToMotor(w4, wheelInputs[3]);
+      displayWheelInputs(wheelInputs); 
     }
-  }*/
-  
-  // Convert revelant ROS Twist message to PWM values
-  float *wheelInputs = fromTwistToPWM(linear_x, linear_y, angular_z);
-  sendToMotor(w1, wheelInputs[0]);
-  sendToMotor(w2, wheelInputs[1]);
-  sendToMotor(w3, wheelInputs[2]);
-  sendToMotor(w4, wheelInputs[3]);
-  if(DEBUG == 1) displayWheelInputs(wheelInputs); 
+  }
   delay(2000);
 }
 

@@ -209,7 +209,7 @@ String getStrSegmentByDelim(String originalStr, char delim, int order){
 }
 
 void movementTest(){
-  // Sequence: Forward, Backward, Strafe Left, Strafe Right, Turn Left, Turn Right 
+  String sequence[] = {"Forward", "Backward", "Strafe Left", "Strafe Right", "Turn Left", "Turn Right"}; 
   double wheel1TestVals[] = {0.5,-0.5,-0.5,0.5,-0.5,0.5};
   double wheel2TestVals[] = {0.5,-0.5,0.5,-0.5,0.5,-0.5};
   double wheel3TestVals[] = {0.5,-0.5,-0.5,0.5,0.5,-0.5};
@@ -221,6 +221,8 @@ void movementTest(){
     sendToMotor(w2, wheel2TestVals[i]);
     sendToMotor(w3, wheel3TestVals[i]);
     sendToMotor(w4, wheel4TestVals[i]);
+    Serial.print("Movement: ");
+    Serial.println(sequence[i]);
     displayWheelInputs(wheelInputs); 
     delay(2000);
   }

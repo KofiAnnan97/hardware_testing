@@ -84,17 +84,6 @@ void displayWheelInputs(double* wheelInputs){
   Serial.println(wheelInputs[2]);
 }
 
-/*void displayWheelPWMs(wheelState w1, wheelState w2, wheelState w3, wheelState w4){
-  Serial.print("     | Wheel PWMs | \nFL: ");
-  //Serial.print(analogRead(w1.pwm_pin));
-  Serial.print("\t FR: ");
-  //Serial.print(analogRead(w1.pwm_pin));
-  Serial.print("\nBL: ");
-  //Serial.print(analogRead(w1.pwm_pin));
-  Serial.print("\t BR: ");
-  //Serial.println(analogRead(w1.pwm_pin));
-}*/
-
 void setup() {
   /* OUTPUTS */
   pinMode(WHEEL1_EN, OUTPUT);
@@ -263,31 +252,23 @@ void loop() {
     Serial.println(command);
     // Bring up the help menu
     if(command.equals("help")) helpMenu();
+    // Set all motors to zero (stop vehicle) 
+    else if(command.equals("stop")) stopMotors();
      // Check that motors speed up and slow down properly
     else if(command.equals("vtest")) speedTest();
     // Check that mecanum wheel configuration can turn and strafe
     else if(command.equals("mtest")) movementTest();
     else{
-      if(command.equals("stop")){
-        linear_x  = 0.0; 
-        linear_y  = 0.0; 
-        angular_z = 0.0;
-      }
-      else{
-        String x = getStrSegmentByDelim(command, delimiter, 0);
-        String y = getStrSegmentByDelim(command, delimiter, 1);
-        String z = getStrSegmentByDelim(command, delimiter, 2);
-        linear_x  = x.toFloat();
-        linear_y  = y.toFloat();
-        angular_z = z.toFloat();
-        if(DEBUG == 1){
-          Serial.print("X: ");
-          Serial.print(linear_x);
-          Serial.print(" Y: ");
-          Serial.print(linear_y);
-          Serial.print(" Z: ");
-          Serial.println(angular_z);
-        }
+      linear_x  = getStrSegmentByDelim(command, delimiter, 0).toFloat();
+      linear_y  = getStrSegmentByDelim(command, delimiter, 1).toFloat();
+      angular_z = getStrSegmentByDelim(command, delimiter, 2).toFloat();
+      if(DEBUG == 1){
+        Serial.print("X: ");
+        Serial.print(linear_x);
+        Serial.print(" Y: ");
+        Serial.print(linear_y);
+        Serial.print(" Yaw: ");
+        Serial.println(angular_z);
       }
       // Convert revelant ROS Twist message to PWM values
       double *wheelInputs = fromTwistToPWM(linear_x, linear_y, angular_z);
@@ -300,4 +281,3 @@ void loop() {
   }
   delay(2000);
 }
-

@@ -2,16 +2,17 @@
 #include "TeensyThreads.h"
 
 /*
-This script is designed for a four wheel vehicle equipped with mecanum wheels.
+This script is designed for a four wheel vehicle equipped with mecanum wheels
+using a Teensy 4.0.
 Configuration:
 
-          |=| |==========| |=|
-  Wheel 1 | |+|          |+| | Wheel 2
-          |=| |          | |=|
-              |          |
-          |=| |          | |=|
-  Wheel 4 | |+|          |+| | Wheel 3
-          |=| |==========| |=|
+          |\=| |==========| |=/|
+  Wheel 1 |=\|+|          |+|/=| Wheel 2
+          |\=| |          | |=/|
+               |          |
+          |=/| |          | |\=|
+  Wheel 4 |/=|+|          |+|=\| Wheel 3
+          |=/| |==========| |\=|
 */
 
 // Motor Driver 1 Pins
@@ -66,11 +67,11 @@ const char delimiter = ' ';
 
 void helpMenu(){
   Serial.println("The following commands are supported:");
-  Serial.println("\t- stop                        : sets all motors to zero");
-  Serial.println("\t- vtest                       : test velocity control for all wheels");
-  Serial.println("\t- mtest                       : test wheel config via possible movement patterns");
-  Serial.println("\t- linear_x linear_y angular_z : set the movement of vehicle (must be single space between values)");
-  Serial.println("\t- help                        : bring up this menu");
+  Serial.println("\t- \"stop\"                        : sets all motors to zero");
+  Serial.println("\t- \"vtest\"                       : test velocity control for all wheels");
+  Serial.println("\t- \"mtest\"                       : test wheel config via possible movement patterns");
+  Serial.println("\t- linear_x linear_y angular_z     : set the movement of vehicle (floats with single space delimiter)");
+  Serial.println("\t- \"help\"                        : bring up this menu");
 }
 
 void displayWheelInputs(double* wheelInputs){
@@ -248,7 +249,7 @@ void loop() {
   if(Serial.available()){
     command = Serial.readStringUntil('\n');
     command.trim();
-    Serial.print("Command: ");
+    Serial.print("\nCommand: ");
     Serial.println(command);
     // Bring up the help menu
     if(command.equals("help")) helpMenu();

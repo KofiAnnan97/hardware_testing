@@ -33,8 +33,8 @@ void setup() {
   Serial.begin(115200);
 }
 
-void sendToMotor(int in1_state, int in2_state, int in1, int in2, int pwm_pin, double speed_input){
-  double scaled_max = MAX_SPEED_INPUT/(double)MAX_SPEED_INPUT;
+void sendToMotor(int in1_state, int in2_state, int in1, int in2, int pwm_pin, float speed_input){
+  float scaled_max = MAX_SPEED_INPUT/(float)MAX_SPEED_INPUT;
   if(speed_input < MIN_SPEED_INPUT) speed_input = MIN_SPEED_INPUT;
   else if(speed_input > scaled_max) speed_input = scaled_max;
 
@@ -62,12 +62,12 @@ void sendToMotor(int in1_state, int in2_state, int in1, int in2, int pwm_pin, do
 }
 
 void loop() {
-  for(double i = 0.0; i < 1.5; i += 0.1){
+  for(float i = 0.0; i < 1.5; i += 0.1){
     sendToMotor(1, 0, WHEEL1_IN1, WHEEL1_IN2, WHEEL1_EN, i);
     sendToMotor(1, 0, WHEEL2_IN1, WHEEL2_IN2, WHEEL2_EN, i);
     delay(2000);
   }
-  for(double j = 1.0; j > -0.5; j -= 0.1){
+  for(float j = 1.0; j > -0.5; j -= 0.1){
     sendToMotor(0, 1, WHEEL1_IN1, WHEEL1_IN2, WHEEL1_EN, j);
     sendToMotor(0, 1, WHEEL2_IN1, WHEEL2_IN2, WHEEL2_EN, j);
     delay(2000);

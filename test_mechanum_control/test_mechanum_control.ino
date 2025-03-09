@@ -57,9 +57,9 @@ struct wheelState{
 wheelState w1, w2, w3, w4;
 
 /* Twist Values */
-double linear_x = 0.0;   //speed  => [-1.0, 1.0] backwards to forwards
-double linear_y = 0.0;   //strafe => [-1.0, 1.0] left to right
-double angular_z = 0.0;  //turn   => [-1.0, 1.0] left to right
+float linear_x = 0.0;   //speed  => [-1.0, 1.0] backwards to forwards
+float linear_y = 0.0;   //strafe => [-1.0, 1.0] left to right
+float angular_z = 0.0;  //turn   => [-1.0, 1.0] left to right
 
 /* Command Values */
 String command;
@@ -74,7 +74,7 @@ void helpMenu(){
   Serial.println("\t- \"help\"                        : bring up this menu");
 }
 
-void displayWheelInputs(double* wheelInputs){
+void displayWheelInputs(float* wheelInputs){
   Serial.print("   | Wheel Inputs | \nFL: ");
   Serial.print(wheelInputs[0]);
   Serial.print("\t FR: ");
@@ -122,9 +122,9 @@ void setup() {
   stopMotors();
 }
 
-void sendToMotor(wheelState ws, double speed_input){
+void sendToMotor(wheelState ws, float speed_input){
   int in1_state, in2_state;
-  double scaled_max = MAX_SPEED_INPUT/(double)MAX_SPEED_INPUT;
+  float scaled_max = MAX_SPEED_INPUT/(float)MAX_SPEED_INPUT;
   if(abs(speed_input) < MIN_SPEED_INPUT) speed_input = MIN_SPEED_INPUT/abs(scaled_max);
   else if(abs(speed_input) > scaled_max) speed_input = speed_input/abs(scaled_max);
 
@@ -158,14 +158,16 @@ void sendToMotor(wheelState ws, double speed_input){
 }
 
 void stopMotors(){
-  sendToMotor(w1, 0.0);
-  sendToMotor(w2, 0.0);
-  sendToMotor(w3, 0.0);
-  sendToMotor(w4, 0.0);
+  float wheelInputs[] = {0.0, 0.0, 0.0, 0.0};
+  sendToMotor(w1, wheelInputs[0]);
+  sendToMotor(w2, wheelInputs[1]);
+  sendToMotor(w3, wheelInputs[2]);
+  sendToMotor(w4, wheelInputs[3]);
+  displayWheelInputs(wheelInputs);
 }
 
-double* fromTwistToPWM(double speed, double strafe, double turn){
-  double *wheels = new double[4];
+float* fromTwistToPWM(float speed, float strafe, float turn){
+  float *wheels = new float[4];
 
   wheels[0] = speed + strafe + turn; 
   wheels[1] = speed - strafe - turn; 
@@ -200,13 +202,13 @@ String getStrSegmentByDelim(String originalStr, char delim, int order){
 
 void movementTest(){
   String sequence[] = {"Forward", "Backward", "Strafe Left", "Strafe Right", "Turn Left", "Turn Right"}; 
-  double wheel1TestVals[] = {0.5,-0.5,-0.5,0.5,-0.5,0.5};
-  double wheel2TestVals[] = {0.5,-0.5,0.5,-0.5,0.5,-0.5};
-  double wheel3TestVals[] = {0.5,-0.5,-0.5,0.5,0.5,-0.5};
-  double wheel4TestVals[] = {0.5,-0.5,0.5,-0.5,-0.5,0.5};
+  float wheel1TestVals[] = {0.5,-0.5,-0.5,0.5,-0.5,0.5};
+  float wheel2TestVals[] = {0.5,-0.5,0.5,-0.5,0.5,-0.5};
+  float wheel3TestVals[] = {0.5,-0.5,-0.5,0.5,0.5,-0.5};
+  float wheel4TestVals[] = {0.5,-0.5,0.5,-0.5,-0.5,0.5};
 
   for(int i = 0; i < 6; i++){
-    double wheelInputs[] = {wheel1TestVals[i], wheel2TestVals[i], wheel3TestVals[i], wheel4TestVals[i]};
+    float wheelInputs[] = {wheel1TestVals[i], wheel2TestVals[i], wheel3TestVals[i], wheel4TestVals[i]};
     sendToMotor(w1, wheel1TestVals[i]);
     sendToMotor(w2, wheel2TestVals[i]);
     sendToMotor(w3, wheel3TestVals[i]);
@@ -221,7 +223,7 @@ void movementTest(){
 
 void speedTest(){
   // Speed Up
-  for(double i = 0.0; i < 1.2; i += 0.1){
+  for(float i = 0.0; i < 1.2; i += 0.1){
     sendToMotor(w1, i);
     sendToMotor(w2, i);
     sendToMotor(w3, i);
@@ -232,7 +234,7 @@ void speedTest(){
   }
 
   // Slow down
-  for(double j = 1.0; j > 0; j -= 0.1){
+  for(float j = 1.0; j > 0; j -= 0.1){
     sendToMotor(w1, j);
     sendToMotor(w2, j);
     sendToMotor(w3, j);
@@ -272,7 +274,7 @@ void loop() {
         Serial.println(angular_z);
       }
       // Convert revelant ROS Twist message to PWM values
-      double *wheelInputs = fromTwistToPWM(linear_x, linear_y, angular_z);
+      float *wheelInputs = fromTwistToPWM(linear_x, linear_y, angular_z);
       sendToMotor(w1, wheelInputs[0]);
       sendToMotor(w2, wheelInputs[1]);
       sendToMotor(w3, wheelInputs[2]);

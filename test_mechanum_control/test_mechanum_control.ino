@@ -70,7 +70,7 @@ void helpMenu(){
   Serial.println("\t- \"stop\"                        : sets all motors to zero");
   Serial.println("\t- \"vtest\"                       : test velocity control for all wheels");
   Serial.println("\t- \"mtest\"                       : test wheel config via possible movement patterns");
-  Serial.println("\t- linear_x linear_y angular_z     : set the movement of vehicle (floats with single space delimiter)");
+  Serial.println("\t- linear_x linear_y angular_z   : set the movement of vehicle (floats with single space delimiter)");
   Serial.println("\t- \"help\"                        : bring up this menu");
 }
 
@@ -264,7 +264,7 @@ void loop() {
       linear_y  = getStrSegmentByDelim(command, delimiter, 1).toFloat();
       angular_z = getStrSegmentByDelim(command, delimiter, 2).toFloat();
       if(DEBUG == 1){
-        Serial.print("X: ");
+        Serial.print("Speed | X: ");
         Serial.print(linear_x);
         Serial.print(" Y: ");
         Serial.print(linear_y);

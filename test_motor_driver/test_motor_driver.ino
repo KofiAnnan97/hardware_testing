@@ -72,14 +72,4 @@ void loop() {
     sendToMotor(0, 1, WHEEL2_IN1, WHEEL2_IN2, WHEEL2_EN, j);
     delay(2000);
   }
-  
-  /* For mecanum wheels */
-  // Strafe right
-  sendToMotor(1, 0, WHEEL1_IN1, WHEEL1_IN2, WHEEL1_EN, 0.1);
-  sendToMotor(0, 1, WHEEL2_IN1, WHEEL2_IN2, WHEEL2_EN, 0.1);
-  delay(2000);
-  // Strafe left
-  sendToMotor(0, 1, WHEEL1_IN1, WHEEL1_IN2, WHEEL1_EN, 0.1);
-  sendToMotor(1, 0, WHEEL2_IN1, WHEEL2_IN2, WHEEL2_EN, 0.1);
-  delay(2000);
 }

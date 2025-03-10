@@ -2,11 +2,13 @@
 A collection of scripts used to the functionality of hardware and hardware setups for Arduino and Teensy deployments.  
 
 ## Overview of Scripts
-- [Digital Servo](/test_servo/test_servo.ino) 
-- [L298N Motor Driver](/test_motor_driver/test_motor_driver.ino)
-- [Mecanum Wheels Control](/test_mechanum_control/test_mechanum_control.ino)
+- [Digital Servo](/generic/test_servo/test_servo.ino) 
+- [L298N Motor Driver](/generic/test_motor_driver/test_motor_driver.ino)
+- [Mecanum Wheels Control](/generic/test_mechanum_control/test_mechanum_control.ino)
 - RP Lidar A1 Series
-	- [Arduino Mega](/test_lidar_mega/test_lidar_mega.ino)
+	- [Arduino Mega](/arduino_mega/test_rplidar_a1/test_rplidar_a1.ino)
+- WT901 AHRS (Serial)
+	- [Arduino Mega](/arduino_mega/test_wt901_serial/test_wt901_serial.ino)
 
 ## Digital Servo
 ![](/img/hiwonder_hps-2018.jpg)
@@ -54,4 +56,19 @@ float range_min
 float range_max
 float[] ranges
 float[] intensities
+```
+
+## WT901 AHRS Serial
+![](/img/wt901.jpg)
+This code is designed to translate the accelerometer, magnetometer, and gyroscope to retrieve the orientation and velocity for the IMU ROS message.
+
+#### sensor_msgs/msg/Imu Message
+```
+std_msgs/msg/Header header
+geometry_msgs/msg/Quaternion orientation
+float64[9] orientation_covariance
+geometry_msgs/msg/Vector3 angular_velocity
+float64[9] angular_velocity_covariance
+geometry_msgs/msg/Vector3 linear_acceleration
+float64[9] linear_acceleration_covariance
 ```

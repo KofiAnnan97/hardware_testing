@@ -64,25 +64,21 @@ float angular_z = 0.0;  //turn   => [-1.0, 1.0] left to right
 String command;
 const char delimiter = ' ';
 
-void helpMenu(){
-  Serial.println("The following commands are supported:");
-  Serial.println("\t- \"stop\"                        : sets all motors to zero");
-  Serial.println("\t- \"vtest\"                       : test velocity control for all wheels");
-  Serial.println("\t- \"mtest\"                       : test wheel config via possible movement patterns");
-  Serial.println("\t- linear_x linear_y angular_z   : set the movement of vehicle (floats with single space delimiter)");
-  Serial.println("\t- \"help\"                        : bring up this menu");
-}
+/* Control Functions */
+float* fromTwistToPWM(float speed, float strafe, float turn);
+void sendToMotor(wheelState ws, float speed_input);
+void stopMotors();
 
-void displayWheelInputs(float* wheelInputs){
-  Serial.print("   | Wheel Inputs | \nFL: ");
-  Serial.print(wheelInputs[0]);
-  Serial.print("\t FR: ");
-  Serial.print(wheelInputs[1]);
-  Serial.print("\nBL: ");
-  Serial.print(wheelInputs[3]);
-  Serial.print("\t BR: ");
-  Serial.println(wheelInputs[2]);
-}
+/* Command Functions */
+String getStrSegmentByDelim(String originalStr, char delim, int order);
+
+/* Display Functions */
+void helpMenu();
+void displayWheelInputs(float* wheelInputs);
+
+/* Test Functions */
+void movementTest();
+void speedTest();
 
 void setup() {
   /* OUTPUTS */
@@ -118,7 +114,64 @@ void setup() {
 
   Serial.begin(115200);
   helpMenu();
+  Serial.println("\nSet motors to zero.");
   stopMotors();
+}
+
+void loop() {
+  // Send commands to mecanum wheels based on speed, strafe and turn
+  if(Serial.available()){
+    command = Serial.readStringUntil('\n');
+    command.trim();
+    Serial.print("\nCommand: ");
+    Serial.println(command);
+    // Bring up the help menu
+    if(command.equals("help")) helpMenu();
+    // Set all motors to zero (stop vehicle) 
+    else if(command.equals("stop")) stopMotors();
+     // Check that motors speed up and slow down properly
+    else if(command.equals("vtest")) speedTest();
+    // Check that mecanum wheel configuration can turn and strafe
+    else if(command.equals("mtest")) movementTest();
+    else{
+      linear_x  = getStrSegmentByDelim(command, delimiter, 0).toFloat();
+      linear_y  = getStrSegmentByDelim(command, delimiter, 1).toFloat();
+      angular_z = getStrSegmentByDelim(command, delimiter, 2).toFloat();
+      if(DEBUG == 1){
+        Serial.print("Speed | X: ");
+        Serial.print(linear_x);
+        Serial.print(" Y: ");
+        Serial.print(linear_y);
+        Serial.print(" Yaw: ");
+        Serial.println(angular_z);
+      }
+      // Convert revelant ROS Twist message to PWM values
+      float *wheelInputs = fromTwistToPWM(linear_x, linear_y, angular_z);
+      sendToMotor(w1, wheelInputs[0]);
+      sendToMotor(w2, wheelInputs[1]);
+      sendToMotor(w3, wheelInputs[2]);
+      sendToMotor(w4, wheelInputs[3]);
+      displayWheelInputs(wheelInputs); 
+    }
+  }
+  delay(2000);
+}
+
+float* fromTwistToPWM(float speed, float strafe, float turn){
+  float *wheels = new float[4];
+
+  wheels[0] = speed + strafe + turn; 
+  wheels[1] = speed - strafe - turn; 
+  wheels[3] = speed - strafe + turn;
+  wheels[2] = speed + strafe - turn;
+
+  if(speed+abs(turn) > 1){
+    wheels[0] /= speed + turn;
+    wheels[1] /= speed + turn;
+    wheels[2] /= speed + turn;
+    wheels[3] /= speed + turn;
+  }
+  return wheels;
 }
 
 void sendToMotor(wheelState ws, float speed_input){
@@ -165,23 +218,6 @@ void stopMotors(){
   displayWheelInputs(wheelInputs);
 }
 
-float* fromTwistToPWM(float speed, float strafe, float turn){
-  float *wheels = new float[4];
-
-  wheels[0] = speed + strafe + turn; 
-  wheels[1] = speed - strafe - turn; 
-  wheels[3] = speed - strafe + turn;
-  wheels[2] = speed + strafe - turn;
-
-  if(speed+abs(turn) > 1){
-    wheels[0] /= speed + turn;
-    wheels[1] /= speed + turn;
-    wheels[2] /= speed + turn;
-    wheels[3] /= speed + turn;
-  }
-  return wheels;
-}
-
 String getStrSegmentByDelim(String originalStr, char delim, int order){
   int delimCount = 0;
   int startIdx = 0;
@@ -197,6 +233,26 @@ String getStrSegmentByDelim(String originalStr, char delim, int order){
   }
   if(startIdx < endIdx) return(originalStr.substring(startIdx, endIdx+1));
   else return "";
+}
+
+void helpMenu(){
+  Serial.println("The following commands are supported:");
+  Serial.println("\t- \"stop\"                        : sets all motors to zero");
+  Serial.println("\t- \"vtest\"                       : test velocity control for all wheels");
+  Serial.println("\t- \"mtest\"                       : test wheel config via possible movement patterns");
+  Serial.println("\t- linear_x linear_y angular_z   : set the movement of vehicle (floats with single space delimiter)");
+  Serial.println("\t- \"help\"                        : bring up this menu");
+}
+
+void displayWheelInputs(float* wheelInputs){
+  Serial.print("   | Wheel Inputs | \nFL: ");
+  Serial.print(wheelInputs[0]);
+  Serial.print("\t FR: ");
+  Serial.print(wheelInputs[1]);
+  Serial.print("\nBL: ");
+  Serial.print(wheelInputs[3]);
+  Serial.print("\t BR: ");
+  Serial.println(wheelInputs[2]);
 }
 
 void movementTest(){
@@ -243,43 +299,4 @@ void speedTest(){
     delay(2000);
   }
   stopMotors();
-}
-
-void loop() {
-  // Send commands to mecanum wheels based on speed, strafe and turn
-  if(Serial.available()){
-    command = Serial.readStringUntil('\n');
-    command.trim();
-    Serial.print("\nCommand: ");
-    Serial.println(command);
-    // Bring up the help menu
-    if(command.equals("help")) helpMenu();
-    // Set all motors to zero (stop vehicle) 
-    else if(command.equals("stop")) stopMotors();
-     // Check that motors speed up and slow down properly
-    else if(command.equals("vtest")) speedTest();
-    // Check that mecanum wheel configuration can turn and strafe
-    else if(command.equals("mtest")) movementTest();
-    else{
-      linear_x  = getStrSegmentByDelim(command, delimiter, 0).toFloat();
-      linear_y  = getStrSegmentByDelim(command, delimiter, 1).toFloat();
-      angular_z = getStrSegmentByDelim(command, delimiter, 2).toFloat();
-      if(DEBUG == 1){
-        Serial.print("Speed | X: ");
-        Serial.print(linear_x);
-        Serial.print(" Y: ");
-        Serial.print(linear_y);
-        Serial.print(" Yaw: ");
-        Serial.println(angular_z);
-      }
-      // Convert revelant ROS Twist message to PWM values
-      float *wheelInputs = fromTwistToPWM(linear_x, linear_y, angular_z);
-      sendToMotor(w1, wheelInputs[0]);
-      sendToMotor(w2, wheelInputs[1]);
-      sendToMotor(w3, wheelInputs[2]);
-      sendToMotor(w4, wheelInputs[3]);
-      displayWheelInputs(wheelInputs); 
-    }
-  }
-  delay(2000);
 }

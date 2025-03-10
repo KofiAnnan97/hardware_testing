@@ -2,13 +2,13 @@
 A collection of scripts used to the functionality of hardware and hardware setups for Arduino and Teensy deployments.  
 
 ## Overview of Scripts
-- [Digital Servo](/generic/test_servo/test_servo.ino) 
-- [L298N Motor Driver](/generic/test_motor_driver/test_motor_driver.ino)
-- [Mecanum Wheels Control](/generic/test_mechanum_control/test_mechanum_control.ino)
+- Generic
+	- [Digital Servo](/generic/test_servo/test_servo.ino) 
+	- [L298N Motor Driver](/generic/test_motor_driver/test_motor_driver.ino)
+	- [Mecanum Wheels Control](/generic/test_mechanum_control/test_mechanum_control.ino)
+	- [WT901 AHRS (Serial)](/generic/test_wt901_serial/test_wt901_serial.ino)
 - RP Lidar A1 Series
 	- [Arduino Mega](/arduino_mega/test_rplidar_a1/test_rplidar_a1.ino)
-- WT901 AHRS (Serial)
-	- [Arduino Mega](/arduino_mega/test_wt901_serial/test_wt901_serial.ino)
 
 ## Digital Servo
 ![](/img/hiwonder_hps-2018.jpg)

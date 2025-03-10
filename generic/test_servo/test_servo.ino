@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include "TeensyThreads.h"
 #include <Servo.h> 
  
 #define SERVO_PIN 14
@@ -20,7 +19,7 @@ String command;
 */
 
 void helpMenu(){
-  Serial.println("The following commands are supported:");
+  Serial.println("\nThe following commands are supported:");
   Serial.println("\t- \"center\"     : sets servo to center angle");
   Serial.println("\t- \"sweep\"      : test velocity control for all wheels");
   Serial.println("\t- \"read\"       : get the current servo angle");

@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include "TeensyThreads.h"
 
 // Motor Driver 1 Pins
 const int WHEEL1_EN  = 23;

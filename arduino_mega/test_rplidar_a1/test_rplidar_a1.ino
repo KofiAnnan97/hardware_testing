@@ -58,7 +58,7 @@ void loop() {
     
     if(startBit){
       long end_time = millis();
-      scan_time = (float)(end_time-start_time)/1000.0;
+      scan_time = (end_time-start_time)/1000.0;
       time_increment = scan_time/(angle_max-angle_min+1);
       start_time = end_time;
       /*Serial.print("Scan time: ");

@@ -2,13 +2,16 @@
 #include <RPLidar.h>
 
 /*
-  For use with Arduino Mega 2560
+  For use with Arduino Mega 2560 (Serial3) and Teensy 4.X
 */
 
-/* Lidar Pins */
+/* Lidar Setup */
 #define LIDAR_MOTOR 10
 #define LIDAR_MOTOR_SPEED 255
 #define lidarSerial Serial3
+
+/* Debug */
+#define DEBUG 1
 
 /* Initialize Lidar object */
 RPLidar lidar; 
@@ -45,15 +48,17 @@ void loop() {
     bool  startBit = lidar.getCurrentPoint().startBit;   //whether this point is belong to a new scan
     //byte  quality  = lidar.getCurrentPoint().quality;  //quality of the current measurement
     
-    uint16_t degree = (uint16_t)angle;
-    float distMeters = distance/1000;
-    // store distance by degree and convert to meters
+    uint16_t degree = (uint16_t)angle;  //convert angle to integer
+    float distMeters = distance/1000.0; //convert to meters
+    
     if(degree >= angle_min && degree <= angle_max && distMeters >= range_min && distMeters <= range_max) {
       ranges[degree] = distMeters;
-      /*Serial.print("Angle: ");
-      Serial.print(degree);
-      Serial.print(" Distance: ");
-      Serial.println(ranges[degree]);*/
+      if(DEBUG == 1){
+        Serial.print("Angle: ");
+        Serial.print(degree);
+        Serial.print(" Distance: ");
+        Serial.println(ranges[degree]);
+      } 
     }
     
     if(startBit){
@@ -61,14 +66,16 @@ void loop() {
       scan_time = (end_time-start_time)/1000.0;
       time_increment = scan_time/(angle_max-angle_min+1);
       start_time = end_time;
-      /*Serial.print("Scan time: ");
-      Serial.println(scan_time);
-      Serial.print("Time increment: ");
-      Serial.println(time_increment, 10);*/
+      if(DEBUG == 1){
+        Serial.print("Scan time: ");
+        Serial.println(scan_time);
+        Serial.print("Time increment: ");
+        Serial.println(time_increment, 10);
+      }
     }
     
   } else {
-    analogWrite(LIDAR_MOTOR, 0); //stop the rplidar motor
+    analogWrite(LIDAR_MOTOR, 0); //stop lidar motor
     
     // try to detect RPLIDAR... 
     rplidar_response_device_info_t info;

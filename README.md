@@ -1,6 +1,14 @@
 # hardware_testing
 A collection of scripts used to test the functionality of hardware with various microprocessors.  
 
+## Microprocessor/Mircocontroller Pinout Diagrams
+- [Arduino Mega](/pinouts/arduino_mega_2560_r3.pdf)
+- Teensy 4.0 
+	- [Front Side](/pinouts/teeny_40_front.pdf)
+	- [Back Side](/pinouts/teeny_40_back.pdf)
+- [Raspberry Pi Pico 1/2](/pinouts/raspberry_pi_pico_2.pdf)
+
+
 ## Overview of Scripts
 - Generic
 	- [Digital Servo](/generic/test_servo/test_servo.ino) 
@@ -12,7 +20,7 @@ A collection of scripts used to test the functionality of hardware with various 
 	- [Real-Time Clock DS2321](/arduino_mega/test_rtc_DS3231/test_rtc_DS3231.ino) (requires [RTClib](https://github.com/adafruit/RTClib))
 - Teensy 4.X
 	- [Internal RTC and Processor Temperature](/teensy_4/test_internal_rtc_and_temp/test_internal_rtc_and_temp.ino) (requires [TimeLib](https://github.com/PaulStoffregen/Time), [InternalTemperature](https://github.com/LAtimes2/InternalTemperature))
-- Raspberry Pico 2
+- Raspberry Pi Pico 2
 	- [Real-Time Clock DS2321](/arduino_mega/test_rtc_DS3231/test_rtc_DS3231.ino) (requires [RTClib](https://github.com/adafruit/RTClib))
 
 ## Digital Servo
@@ -34,6 +42,18 @@ A simple script to that confirms that a L298N motor driver that can support to m
 
 
 ## Mecanum Wheel Control
+```
+Wheel Configuration:
+
+          |\=| |==========| |=/|
+  Wheel 1 |=\|+|          |+|/=| Wheel 2
+          |\=| |          | |=/|
+               |          |
+          |=/| |          | |\=|
+  Wheel 4 |/=|+|          |+|=\| Wheel 3
+          |=/| |==========| |\=|
+
+```
 This script is designed to test the speed control and movement patterns of a four-wheeled vehicle using mecanum (omni) wheels. It integrates serial based command line for testing and can be used to confirm that forward, side and turning movement can be controlled with normalized velocities ranging between -1.0 and 1.0.
 
 ```

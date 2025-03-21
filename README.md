@@ -1,5 +1,5 @@
 # hardware_testing
-A collection of scripts used to the functionality of hardware and hardware setups for Arduino and Teensy deployments.  
+A collection of scripts used to test the functionality of hardware with various microprocessors.  
 
 ## Overview of Scripts
 - Generic
@@ -8,10 +8,12 @@ A collection of scripts used to the functionality of hardware and hardware setup
 	- [Mecanum Wheels Control](/generic/test_mechanum_control/test_mechanum_control.ino)
 	- [RP Lidar A1 Series](/generic/test_rplidar_a1/test_rplidar_a1.ino)
 	- [WT901 AHRS (Serial)](/generic/test_wt901_serial/test_wt901_serial.ino)
-- Arduino Mega 
+- Arduino Uno/Mega 
 	- [Real-Time Clock DS2321](/arduino_mega/test_rtc_DS3231/test_rtc_DS3231.ino) (requires [RTClib](https://github.com/adafruit/RTClib))
 - Teensy 4.X
-	- [Internal RTC and Processor Temperature](/teensy_4/test_internal_rtc_and_temp/test_internal_rtc_and_temp.ino) (requires [InternalTemperature](https://github.com/LAtimes2/InternalTemperature))
+	- [Internal RTC and Processor Temperature](/teensy_4/test_internal_rtc_and_temp/test_internal_rtc_and_temp.ino) (requires [TimeLib](https://github.com/PaulStoffregen/Time), [InternalTemperature](https://github.com/LAtimes2/InternalTemperature))
+- Raspberry Pico 2
+	- [Real-Time Clock DS2321](/arduino_mega/test_rtc_DS3231/test_rtc_DS3231.ino) (requires [RTClib](https://github.com/adafruit/RTClib))
 
 ## Digital Servo
 ![](/img/hiwonder_hps-2018.jpg)

@@ -2,9 +2,18 @@
 
 #define AUTO_SET_RTC 0
 
+/* 
+    +----------+
+    | I2C Pins |
+    +----------+
+    Arduino Uno      => A4(SDA)    A5(SCL) 
+    Arduino Mega     => D20(SDA)   D21(SCL) 
+    Raspberry Pico 2 => GPIO4(SDA) GPIO5(SCL) 
+*/
+
 RTC_DS3231 rtc;
 String command;
-char *delim = ' ';
+char delim = ' ';
 
 /* Time Functions */
 void setDateTime(int year, int month, int day, int hr, int min, int sec);
@@ -107,7 +116,7 @@ void printTimestamp(){
 
 void printDateTime(){
     DateTime now = rtc.now();
-    Serial.print("DateTime: ");
+    Serial.print("Date & Time: ");
     Serial.print(now.year(), DEC);
     Serial.print('/');
     Serial.print(now.month(), DEC);

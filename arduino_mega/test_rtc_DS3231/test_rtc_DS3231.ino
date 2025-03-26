@@ -3,12 +3,14 @@
 #define AUTO_SET_RTC 0
 
 /* 
-    +----------+
-    | I2C Pins |
-    +----------+
-    Arduino Uno      => A4(SDA)    A5(SCL) 
-    Arduino Mega     => D20(SDA)   D21(SCL) 
-    Raspberry Pico 2 => GPIO4(SDA) GPIO5(SCL) 
+    I^2C Pins
+    +------------------+-------+-------+
+    | Board            | SDA   | SCL   |
+    +------------------+-------+-------+
+    | Arduino Uno      | A4    | A5    | 
+    | Arduino Mega     | D20   | D21   | 
+    | Raspberry Pico 2 | GPIO4 | GPIO5 | 
+    +------------------+-------+-------+
 */
 
 RTC_DS3231 rtc;

@@ -3,11 +3,16 @@ A collection of scripts used to test the functionality of hardware with various 
 
 ## Microprocessor/Mircocontroller Pinout Diagrams
 - [Arduino Mega](/pinouts/arduino_mega_2560_r3.pdf)
-- Teensy 4.0 
-	- [Front Side](/pinouts/teeny_40_front.pdf)
-	- [Back Side](/pinouts/teeny_40_back.pdf)
+- Teensy 4.0 ([Front](/pinouts/teeny_40_front.pdf)/[Back](/pinouts/teeny_40_back.pdf))
 - [Raspberry Pi Pico 1/2](/pinouts/raspberry_pi_pico_2.pdf)
+- [Arduino Nano ESP32](/pinouts/arduino_nano_esp32.pdf)
 
+## Datasheets
+- [L298N](/datasheets/l298-1849437.pdf)
+- [RPLidar A1M8](/datasheets/LD108_SLAMTEC_rplidar_datasheet_A1M8_v3.0_en.pdf)
+- [WT901 AHRS IMU Sensor](/datasheets/WT901%20Datasheet.pdf)
+- [DS3231 (Real-time clock)](/datasheets/DS3231.pdf)
+- [DFPlayer Mini](/datasheets/Datasheet%20DFR0299%20DFPlayer%20Mini%20Manual.pdf)
 
 ## Overview of Scripts
 - Generic
@@ -18,6 +23,7 @@ A collection of scripts used to test the functionality of hardware with various 
 	- [WT901 AHRS (Serial)](/generic/test_wt901_serial/test_wt901_serial.ino)
 - Arduino Uno/Mega 
 	- [Real-Time Clock DS2321](/arduino_mega/test_rtc_DS3231/test_rtc_DS3231.ino) (requires [RTClib](https://github.com/adafruit/RTClib))
+	- [DFPlayer Mini](/arduino_mega/test_dfplayer_mini/test_dfplayer_mini.ino) (requires [DFRobotDFPlayerMini](https://github.com/DFRobot/DFRobotDFPlayerMini))
 - Teensy 4.X
 	- [Internal RTC and Processor Temperature](/teensy_4/test_internal_rtc_and_temp/test_internal_rtc_and_temp.ino) (requires [TimeLib](https://github.com/PaulStoffregen/Time), [InternalTemperature](https://github.com/LAtimes2/InternalTemperature))
 - Raspberry Pi Pico 2
@@ -83,8 +89,9 @@ float[] ranges
 float[] intensities
 ```
 
-## WT901 AHRS Serial
+## WT901 AHRS (Serial)
 ![](/img/wt901.jpg)
+
 This code is designed to translate the accelerometer, magnetometer, and gyroscope to retrieve the orientation and velocity for the IMU ROS message. 
 #### sensor_msgs/msg/Imu Message
 ```
@@ -109,3 +116,20 @@ The following commands are supported:
 	- "gt"                          : print temperature
 	- "help" or "h"                 : bring up this menu
 ```
+
+## DFPlayer Mini
+![](/img/dfplayer_mini.jpg)
+
+Plays music using serial communication with a microprocessor. The library used requires that all the mp3 files are on an SD card with integer filenames. Serial commands can be used to interact with the music files.
+```
+The following commands are supported:
+	- "p" num               : play specified mp3 file (default is 1)
+	- "|>"                  : continue mp3 playback
+	- "||"                  : pause mp3 playback
+	- "<<"                  : go to previous mp3
+	- ">>"                  : go to next mp3
+	- "v" num               : set the volume (integer)
+	- "gv"                  : get the current volume
+	- "gm"                  : get the current mp3 file number
+	- "help" or "h"         : bring up this menu
+``` 
